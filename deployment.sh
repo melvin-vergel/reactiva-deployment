@@ -167,7 +167,7 @@ docker run -d \
   --env LETSENCRYPT_HOST="$LETSENCRYPT_HOST_SITE" \
   --env NODE_ENV=production \
   --env TZ="$TZ" \
-  --env API_URL="$API_URL" \  
+  --env API_URL="$API_URL" \
   --expose 80 \
   --network bridge \
   frontend
