@@ -17,7 +17,7 @@ set +o allexport
 if [ -z "$DEFAULT_EMAIL" ] || [ -z "$GITHUB_USER" ] || [ -z "$GITHUB_TOKEN" ] || \
    [ -z "$REPO_URL_API" ] || [ -z "$REPO_BRANCH_API" ] || [ -z "$VIRTUAL_HOST_API" ] || [ -z "$LETSENCRYPT_HOST_API" ] || \
    [ -z "$REPO_URL_SITE" ] || [ -z "$REPO_BRANCH_SITE" ] || [ -z "$VIRTUAL_HOST_SITE" ] || [ -z "$LETSENCRYPT_HOST_SITE" ] || \
-   [ -z "$TOKEN" ] || [ -z "$TZ" ] || [ -z "$API_URL" ] ; then
+   [ -z "$TZ" ] || [ -z "$API_URL" ] ; then
   echo "One or more required environment variables are missing in $ENV_FILE."
   echo "Please ensure all required variables are set."
   exit 1
