@@ -17,7 +17,7 @@ set +o allexport
 if [ -z "$DEFAULT_EMAIL" ] || [ -z "$GITHUB_USER" ] || [ -z "$GITHUB_TOKEN" ] || \
    [ -z "$REPO_URL_API" ] || [ -z "$REPO_BRANCH_API" ] || [ -z "$VIRTUAL_HOST_API" ] || [ -z "$LETSENCRYPT_HOST_API" ] || \
    [ -z "$REPO_URL_SITE" ] || [ -z "$REPO_BRANCH_SITE" ] || [ -z "$VIRTUAL_HOST_SITE" ] || [ -z "$LETSENCRYPT_HOST_SITE" ] || \
-   [ -z "$TZ" ] || [ -z "$API_URL" ] ; then
+   [ -z "$TZ" ] || [ -z "$API_URL" ] || [ -z "$DB_USER" ] || [ -z "$DB_PASSWORD" ] || [ -z "$DB_NAME" ] ; then
   echo "One or more required environment variables are missing in $ENV_FILE."
   echo "Please ensure all required variables are set."
   exit 1
@@ -105,6 +105,22 @@ create_volume_if_missing html
 create_volume_if_missing certs
 create_volume_if_missing acme
 create_volume_if_missing api-docs-cache
+create_volume_if_missing database
+
+echo "--- Setting up Database ---"
+remove_container_if_exists postgres-db
+
+# Run the PostgreSQL container
+docker run -d \
+  --name postgres-db --restart unless-stopped \
+  --cpus=0.5 --memory=500m \
+  -p 5432:5432 \
+  -e POSTGRES_USER="$DB_USER" \
+  -e POSTGRES_PASSWORD="$DB_PASSWORD" \
+  -e POSTGRES_DB="$DB_NAME" \
+  -v database_data:/var/lib/postgresql/data \
+  postgres:17.5-alpine3.22
+
 
 # Run nginx-proxy and acme-companion containers (shared for all services)
 echo "--- Setting up proxy and SSL containers ---"
@@ -146,6 +162,11 @@ docker run -d \
 #   --env TZ="$TZ" \
 #   --env PORT=80 \
 #   --env VALID_ORIGIN="https://$VIRTUAL_HOST_SITE" \
+#   --env DB_HOST=postgres-db \
+#   --env DB_PORT=5432 \
+#   --env DB_USER="$DB_USER" \
+#   --env DB_PASSWORD="$DB_PASSWORD" \
+#   --env DB_NAME="$DB_NAME" \
 #   --expose 80 \
 #   -v api-docs-cache:/app/docs-cache \
 #   --network bridge \
